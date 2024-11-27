@@ -1,6 +1,6 @@
 
 /*	This program creates a square matrix of size AxA, which is filled with random values.
-*	Then the matrix will be transformed to a triangular matrix using the Gauss method.	*/
+*	Then the matrix will be transformed to a triangular matrix using the Gauss method.*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -129,13 +129,17 @@ int main(void)
 
 
 	matrix = matrix_create(size);
+	clock_t start = clock();
 	matrix_fill(matrix, size);
 	
-	print_matrix(matrix, size, 1);
+	//print_matrix(matrix, size, 1);
 
 	triangular_matrix(matrix, size);
 
-	print_matrix(matrix, size, 0);
+	clock_t end = clock();
+	double ms_duration = (double)(end - start) / CLOCKS_PER_SEC * 1000;
+	printf("Time to execute - %f ms\n", ms_duration);
+	//print_matrix(matrix, size, 0);
 	matrix_clean_up(matrix, size);
 	return 0;
 }
