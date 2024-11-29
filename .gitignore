@@ -1,2 +1,6 @@
 # All the binaries
 *.exe
+*.out
+
+# env folders
+.vscode/
