@@ -23,9 +23,9 @@
 	}
 */
 
-// __global__ triangular_matrix(int* matrix, int size) {
-
-// }
+__global__ void triangular_matrix(float* matrix, int size) {
+	return;
+}
 
 void show_matrix(float* hst_matrix, int size) {
     for (int i = 0; i < size; i++) {
@@ -65,9 +65,9 @@ int main(void) {
 
     fill_matrix(dev_input, size);
 
-    // dim3 dimBlock(BLOCK_SIZE, BLOCK_SIZE);
-    // dim3 dimGrid(GRID_SIZE, GRID_SIZE);
-	// triangular_matrix<<<dimGrid, dimBlock>>>(dev_input, size);
+    dim3 dimBlock (BLOCK_SIZE, BLOCK_SIZE);
+    dim3 dimGrid (GRID_SIZE, GRID_SIZE);
+	triangular_matrix <<< dimGrid, dimBlock >>> (dev_input, size);
 
     cudaMemcpy(hst_output, dev_output, size * size, cudaMemcpyDeviceToHost);
 
