@@ -118,11 +118,11 @@ int main(void)
 	if (input_file == NULL)
 	{
 		printf("Failed to open file\n");
-		return;
+		return 1;
 	}
 	fscanf(input_file, "%d", &size);
 #else
-	printf("Enter size of square matrix, which will be transformed into a triangular >>>");
+	printf("Enter size of square matrix, which will be transformed into a triangular >>> ");
 	fflush(stdin);
 	fscanf(stdin, "%d", &size);
 #endif // FILE_INPUT
