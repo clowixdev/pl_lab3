@@ -126,8 +126,8 @@ int main(void)
 	fscanf(stdin, "%d", &size);
 #endif // FILE_INPUT
 
-	matrix = matrix_create(size);
 	clock_t start = clock();
+	matrix = matrix_create(size);
 	matrix_fill(matrix, size);
 
 	// print_matrix(matrix, size, 1);
