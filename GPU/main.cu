@@ -16,24 +16,28 @@ __global__ void add_to_row(float* dev_matrix, int row, int diag, float k, int si
 	}
 }
 
-void triangular_matrix(float* hst_matrix, float* dev_matrix, int size) {
+__global__ void compute_k(float* dev_matrix, int diag, int size) {
 	dim3 threadsPerBlock(BLOCK_SIZE, BLOCK_SIZE);
 	dim3 blocksPerGrid((size + threadsPerBlock.x - 1) / threadsPerBlock.x);
+	int row = diag + 1 + (blockIdx.x * blockDim.x + threadIdx.x);
 
+	if (row < size) {
+		float k = (- 1.0) * dev_matrix[row*size+diag] / dev_matrix[diag*size+diag];
+		__syncthreads();
+		add_to_row<<<blocksPerGrid, threadsPerBlock>>>(dev_matrix, row, diag, k, size);
+	}
+}
+
+void triangular_matrix(float* dev_matrix, int size) {
 	for (int diag = 0; diag < size-1; diag++) {
-		for (int row = diag+1; row < size; row++) {
-			cudaMemcpy(hst_matrix, dev_matrix, sizeof(float) * size * size, cudaMemcpyDeviceToHost);
-
-			float k = (- 1.0) * hst_matrix[row*size+diag] / hst_matrix[diag*size+diag];
-			add_to_row<<<blocksPerGrid, threadsPerBlock>>>(dev_matrix, row, diag, k, size);
-		}
+		compute_k<<<1, size - (diag + 1)>>>(dev_matrix, diag, size);
 	}
 }
 
 void show_matrix(float* hst_matrix, int size) {
     for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++) {
-			printf("%7.2f", hst_matrix[i*size+j]);
+			printf("%8.2f", hst_matrix[i*size+j]);
 		}
 		printf("\n");
 	}
@@ -78,7 +82,7 @@ int main(void) {
 	}
 
 	printf("transforming...");
-	triangular_matrix(hst_matrix, dev_matrix, size);
+	triangular_matrix(dev_matrix, size);
 	printf(" - transformed\n");
 
     if (size <= 20) {
