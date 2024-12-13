@@ -7,19 +7,19 @@
 #include <time.h>
 #include <stdbool.h>
 
-#define RANGE 1000 /* [-RANGE;RANGE] for generating random values*/
+#define RANGE 10 /* [-RANGE;RANGE] for generating random values*/
 #define _CRT_SECURE_NO_WARNINGS
-// #define FILE_INPUT
+ // #define FILE_INPUT
 
-float **matrix_create(int size);
-void matrix_fill(float **matrix, int size);
-void matrix_clean_up(float **matrix, int size);
-void print_matrix(float **matrix, int size, bool flag);
-void triangular_matrix(float **matrix, int size);
+float** matrix_create(int size);
+void matrix_fill(float** matrix, int size);
+void matrix_clean_up(float** matrix, int size);
+void print_matrix(float** matrix, int size, bool flag);
+void triangular_matrix(float** matrix, int size);
 
-float **matrix_create(int size)
+float** matrix_create(int size)
 {
-	float **matrix = (float **)malloc(size * sizeof(float *));
+	float** matrix = (float**)malloc(size * sizeof(float*));
 	if (matrix == NULL)
 	{
 		fprintf(stderr, "Memory allocation failed for matrix rows.\n");
@@ -27,7 +27,7 @@ float **matrix_create(int size)
 	}
 	for (int i = 0; i < size; i++)
 	{
-		matrix[i] = (float *)malloc(size * sizeof(float));
+		matrix[i] = (float*)malloc(size * sizeof(float));
 		if (matrix[i] == NULL)
 		{
 			fprintf(stderr, "Memory allocation failed for matrix columns.\n");
@@ -37,7 +37,7 @@ float **matrix_create(int size)
 	return matrix;
 }
 
-void matrix_fill(float **matrix, int size)
+void matrix_fill(float** matrix, int size)
 {
 	srand(time(NULL));
 
@@ -51,7 +51,7 @@ void matrix_fill(float **matrix, int size)
 	}
 }
 
-void matrix_clean_up(float **matrix, int size)
+void matrix_clean_up(float** matrix, int size)
 {
 	for (int i = 0; i < size; i++)
 	{
@@ -60,17 +60,17 @@ void matrix_clean_up(float **matrix, int size)
 	free(matrix);
 }
 
-void print_matrix(float **matrix, int size, bool flag)
+void print_matrix(float** matrix, int size, bool flag)
 {
-	FILE *file;
+	FILE* file;
 	if (flag == true)
 	{
-		file = fopen("output.txt", "w");
+		file = fopen("../../generated_matrix.txt", "w");
 		fprintf(file, "Generated matrix:\n");
 	}
 	else
 	{
-		file = fopen("output.txt", "a");
+		file = fopen("../../cpu_output.txt", "w");
 		fprintf(file, "Transformed matrix:\n");
 	}
 
@@ -84,7 +84,8 @@ void print_matrix(float **matrix, int size, bool flag)
 	{
 		for (int j = 0; j < size; j++)
 		{
-			fprintf(file, "%8.2f", matrix[i][j]);
+			fprintf(file, "%14.2f ", matrix[i][j]);
+			if(j==1024 && flag == false) fprintf(file," | "); //just for clarity
 		}
 		fprintf(file, "\n");
 	}
@@ -92,7 +93,9 @@ void print_matrix(float **matrix, int size, bool flag)
 	fclose(file);
 }
 
-void triangular_matrix(float **matrix, int size)
+
+
+void triangular_matrix(float** matrix, int size)
 {
 	for (int diag = 0; diag < size - 1; diag++)
 	{
@@ -111,9 +114,9 @@ int main(void)
 {
 
 	int size;
-	float **matrix;
+	float** matrix;
 #ifdef FILE_INPUT
-	FILE *input_file = fopen("input.txt", "r");
+	FILE* input_file = fopen("input.txt", "r");
 	if (input_file == NULL)
 	{
 		printf("Failed to open file\n");
@@ -126,18 +129,20 @@ int main(void)
 	fscanf(stdin, "%d", &size);
 #endif // FILE_INPUT
 
-	clock_t start = clock();
 	matrix = matrix_create(size);
 	matrix_fill(matrix, size);
 
-	// print_matrix(matrix, size, 1);
 
+	print_matrix(matrix, size, 1); //writing generated matrix
+
+	clock_t start = clock();//! START
 	triangular_matrix(matrix, size);
+	clock_t end = clock(); //! STOP
 
-	clock_t end = clock();
 	double ms_duration = (double)(end - start) / CLOCKS_PER_SEC * 1000;
-	printf("Time to execute - %f ms\n", ms_duration);
-	// print_matrix(matrix, size, 0);
+	printf("Time to execute on CPU - %f ms\n", ms_duration);
+
+	print_matrix(matrix, size, 0); //writing transformed matrix
 	matrix_clean_up(matrix, size);
 	return 0;
 }
